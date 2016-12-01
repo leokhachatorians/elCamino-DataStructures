@@ -29,52 +29,64 @@ int main() {
         if (*it == '(') { push_to_stack_flow(balance_stack, *it); }
         else if (*it == '[') { push_to_stack_flow(balance_stack, *it); }
         else if (*it == '{') { push_to_stack_flow(balance_stack, *it); }
-        else if (*it == '"') { push_to_stack_flow(balance_stack, *it); }
-        else if (*it == '\'') { push_to_stack_flow(balance_stack, *it); }
+        else if (*it == '"') { 
+            if (balance_stack.size() > 0 && *it == balance_stack.top()) {
+                balance_stack.pop();
+            }
+            else {
+                push_to_stack_flow(balance_stack, *it);
+            }
+        }
+        else if (*it == '\'') {
+            if (balance_stack.size() > 0 && *it == balance_stack.top()) {
+                balance_stack.pop();
+            }
+            else {
+                push_to_stack_flow(balance_stack, *it);
+            }
+        }
         else if (*it == '/') { 
             it++;
             if (*it == '*') { push_to_stack_flow(balance_stack, 'B'); }
             it--;
         }
 
-        if (balance_stack.size() > 0 && (balance_stack.top() != 'B' || balance_stack.top() != '"' || balance_stack.top() != '\'')) {
-            if (*it == ')') {
-                if (balance_stack.top() != '(') {
-                    cout << "error unbalanced ()" << endl;
-                }
-                else
-                    balance_stack.pop();
+        else if (*it == ')') {
+            if (balance_stack.top() != '(') {
+                cout << "error unbalanced ()" << endl;
             }
-            else if (*it == '}') {
-                if (balance_stack.top() != '{') {
-                    cout << balance_stack.top() << endl;
-                    cout << "error unbalanced {}" << endl;
-                }
-                else
-                    balance_stack.pop();
+            else
+                balance_stack.pop();
+        }
+        else if (*it == '}') {
+            if (balance_stack.top() != '{') {
+                cout << balance_stack.top() << endl;
+                cout << "error unbalanced {}" << endl;
             }
-            else if (*it == ']') {
-                if (balance_stack.top() != '[') {
-                    cout << balance_stack.top() << endl;
-                    cout << "error unbalanced []" << endl;
-                }
-                else
-                    balance_stack.pop();
+            else
+                balance_stack.pop();
+        }
+        else if (*it == ']') {
+            if (balance_stack.top() != '[') {
+                cout << balance_stack.top() << endl;
+                cout << "error unbalanced []" << endl;
             }
-            else if (*it == '"') {
-                if (balance_stack.top() != '"') {
-                    cout << "error unbalanced \"" << endl;
-                }
-                else
-                    balance_stack.pop();
+            else
+                balance_stack.pop();
+        }
+        else if (*it == '"') {
+            if (balance_stack.top() != '"') {
+                cout << "error unbalanced \"" << endl;
             }
-            else if (*it == '\'') {
-                if (balance_stack.top() != '\'') {
-                    cout << "error unbalanced ''" << endl;
-                }
-                else
-                    balance_stack.pop();
+            else
+                balance_stack.pop();
+        }
+        else if (*it == '\'') {
+            if (balance_stack.top() != '\'') {
+                cout << "error unbalanced ''" << endl;
             }
+            else
+                balance_stack.pop();
         }
         else if (*it == '*') {
             it++;
@@ -94,7 +106,6 @@ int main() {
         cout << balance_stack.top() << endl;
         balance_stack.pop();
     }
-
 
     cout << endl;
     return 0;
@@ -118,13 +129,16 @@ bool check_if_in_string_or_block_comment(stack<char> &stack) {
 void push_to_stack_flow(stack<char> &stack, char c) {
     if (check_if_empty(stack)) {
         stack.push(c);
-        cout << "After: " << c << " " << stack.top() << " " << check_if_in_string_or_block_comment(stack) << "\n" << endl;
+        cout << "EMPTY STACK PUSHING: " << c << "\n" << endl;
     }
     else {
-        cout << "Before: " << c << " " << stack.top() << " " << check_if_in_string_or_block_comment(stack) << endl;
+        cout << "CURRENT TOP OF STACK: " << stack.top() << endl;
         if (!check_if_in_string_or_block_comment(stack)) {
-                stack.push(c);
+            stack.push(c);
+            cout << "PUSHED: " << c << endl << endl;
         }
-        cout << "After: " << c << " " << stack.top() << " " << check_if_in_string_or_block_comment(stack) << "\n" << endl;
+        else {
+            cout << "Was in a string" << endl;
+        }
     }
 }

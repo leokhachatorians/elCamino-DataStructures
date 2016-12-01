@@ -6,5 +6,6 @@ int main() {
 	int [a];
 	'a'
 	cout << "testing hello!" << endl;
-}
+
+	/* testing */
 }
