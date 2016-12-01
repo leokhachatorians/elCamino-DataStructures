@@ -16,7 +16,6 @@ int main() {
     stack<char> char_stack;
     stack<char> balance_stack;
     stack<int> line_stack;
-    //int newline_count = 1;
     
     // open file and populate vector
     ifstream file("testing.txt");
@@ -51,38 +50,54 @@ int main() {
             it--;
         }
         else if (*it == ')') {
-            if (balance_stack.top() != '(' && (balance_stack.top() != '"' || balance_stack.top() != 'B' || balance_stack.top() != '\'')) {
-                cout << "IGNRED" << endl;
+            if (balance_stack.size() < 1) {
+                cout << "Error: Stack is empty." << endl;
+            }
+            else if (balance_stack.top() != '(' && (balance_stack.top() != '"' || balance_stack.top() != 'B' || balance_stack.top() != '\'')) {
+                cout << "Was in a string/comment" << endl;
+                //cout << "IGNRED" << endl;
             }
             else
-                cout << "popping" << endl;
+                //cout << "popping" << endl;
                 balance_stack.pop();
         }
         else if (*it == '}') {
-            if (balance_stack.top() != '{' && (balance_stack.top() != '"' || balance_stack.top() != 'B' || balance_stack.top() != '\'')) {
-                cout << "IGNRED" << endl;
+            if (balance_stack.size() < 1) {
+                cout << "Error: Stack is empty." << endl;
+            }
+            else if (balance_stack.top() != '{' && (balance_stack.top() != '"' || balance_stack.top() != 'B' || balance_stack.top() != '\'')) {
+                cout << "Was in a string/comment" << endl;
             }
             else
-                cout << "popping" << endl;
+                //cout << "popping" << endl;
                 balance_stack.pop();
         }
         else if (*it == ']') {
-            if (balance_stack.top() != '[' && (balance_stack.top() != '"' || balance_stack.top() != 'B' || balance_stack.top() != '\'')) {
-                cout << "IGNRED" << endl;
+            if (balance_stack.size() < 1) {
+                cout << "Error: Stack is empty." << endl;
+            }
+            else if (balance_stack.top() != '[' && (balance_stack.top() == '"' || balance_stack.top() == 'B' || balance_stack.top() == '\'')) {
+                cout << "Was in a string/comment" << endl;
             }
             else
-                cout << "popping" << endl;
+                //cout << "popping" << endl;
                 balance_stack.pop();
         }
         else if (*it == '"') {
-            if (balance_stack.top() != '"') {
+            if (balance_stack.size() < 1) {
+                cout << "Error: Stack is empty." << endl;
+            }
+            else if (balance_stack.top() != '"') {
                 cout << "error unbalanced \"" << endl;
             }
             else
                 balance_stack.pop();
         }
         else if (*it == '\'') {
-            if (balance_stack.top() != '\'') {
+            if (balance_stack.size() < 1) {
+                cout << "Error: Stack is empty." << endl;
+            }
+            else if (balance_stack.top() != '\'') {
                 cout << "error unbalanced ''" << endl;
             }
             else
@@ -91,7 +106,10 @@ int main() {
         else if (*it == '*') {
             it++;
             if (*it == '/') {
-                if (balance_stack.top() != 'B') {
+                if (balance_stack.size() < 1) {
+                    cout << "Error: Stack is empty." << endl;
+                }
+                else if (balance_stack.top() != 'B') {
                     cout << "error unbalanced /* */" << endl;
                 }
                 balance_stack.pop();
