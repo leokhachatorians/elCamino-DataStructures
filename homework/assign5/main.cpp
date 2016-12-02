@@ -1,66 +1,69 @@
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <stack>
 #include <vector>
 
 using namespace std;
 
-bool check_if_empty(stack<char> &);
-bool check_if_in_string_or_block_comment(stack<char> &);
-void push_to_stack_flow(stack<char> &, char);
-void pop_flow_parens(stack<char> &, char);
-void handle_quotes(stack<char> &, char);
+struct Data {
+    char c;
+    int line_num;
+};
+
+bool check_if_empty(stack<Data> &);
+bool check_if_in_string_or_block_comment(stack<Data> &);
+void push_to_stack_flow(stack<Data> &, Data);
+void pop_flow_parens(stack<Data> &, Data);
+void handle_quotes(stack<Data> &, Data);
+void handle_block_comments(stack<Data> &, vector<Data>::iterator);
 
 int main() {
-    char c;
-    vector<char> v;
-    stack<char> char_stack;
-    stack<char> balance_stack;
-    stack<int> line_stack;
+    int line_num = 1;
+    string line;
+    vector<Data> v;
+    stack<Data> balance_stack;
     
     // open file and populate vector
     ifstream file("testing.txt");
-    while (file.get(c)) {
-        v.push_back(c);
+    Data data;
+    while (getline(file, line)) {
+        for (unsigned long i = 0; i < line.length(); i++) {
+            data.c = line[i];
+            data.line_num = line_num;
+            v.push_back(data);
+        }
+        line_num++;
+    }
+    line_num = 1;
+
+    file.clear();
+    file.seekg(0);
+    while(getline(file, line)) {
+        cout << setw(3) << left << line_num++ << line << endl;
     }
     file.close();
 
-    for (vector<char>::iterator it = v.begin(); it != v.end(); ++it) {
-        if (*it == '(' || *it == '{' || *it == '[') {
+    for (vector<Data>::iterator it = v.begin(); it != v.end(); ++it) {
+        if (it->c == '(' || it->c == '{' || it->c == '[') {
             push_to_stack_flow(balance_stack, *it);
         }
-        else if (*it == ')' || *it == '}' || *it == ']') {
+        else if (it->c == ')' || it->c == '}' || it->c == ']') {
             pop_flow_parens(balance_stack, *it);
         }
-        else if (*it == '"' || *it == '\'') {
+        else if (it->c == '"' || it->c == '\'') {
             handle_quotes(balance_stack, *it);
         }
-        else if (*it == '/') {
-            it++;
-            if (*it == '*') {
-                push_to_stack_flow(balance_stack, 'B');
-            }
-        }
-        else if (*it == '*') {
-            it++;
-            if (*it == '/') {
-                if (balance_stack.size() < 1) {
-                    cout << "Error: Stack is empty." << endl;
-                }
-                else if (balance_stack.top() != 'B') {
-                    cout << "error unbalanced /* */" << endl;
-                }
-                balance_stack.pop();
-            }
-            it--;
+        else if (it->c == '/' || it->c == '*') {
+            handle_block_comments(balance_stack, it);
         }
     }
 
     cout << balance_stack.size() << endl;
 
     while (!balance_stack.empty()) {
-        cout << balance_stack.top() << endl;
+        cout << balance_stack.top().c << endl;
         balance_stack.pop();
     }
 
@@ -68,55 +71,87 @@ int main() {
     return 0;
 }
 
-void push_to_stack_flow(stack<char> &stack, char c) {
+void push_to_stack_flow(stack<Data> &stack, Data d) {
     if (check_if_empty(stack)) {
-        stack.push(c);
+        stack.push(d);
     }
     else {
         if (!check_if_in_string_or_block_comment(stack)) {
-            stack.push(c);
+            stack.push(d);
         }
     }
 }
 
-void pop_flow_parens(stack<char> &stack, char c) {
+void pop_flow_parens(stack<Data> &stack, Data d) {
     char r;
-    if (c == ']') {
+    if (d.c == ']') {
         r = '[';
     }
-    else if (c == ')') {
+    else if (d.c == ')') {
         r = '(';
     }
-    else if (c == '}') {
+    else if (d.c == '}') {
         r = '{';
     }
 
     if (check_if_empty(stack)) {
-        cout << "Error: Stack is empty" << endl;
+        cout << "Unbalanced: " << r << d.c << " on line " << d.line_num << endl;
+        //cout << "Error: Stack is empty" << endl;
     }
-    else if (!(stack.top() != r && check_if_in_string_or_block_comment(stack))) {
-        stack.pop();
-    }
-}
-
-void handle_quotes(stack<char> &stack, char c) {
-    if (stack.size() > 0 && c == stack.top()) {
+    else if (stack.top().c == r && !(check_if_in_string_or_block_comment(stack))) {
         stack.pop();
     }
     else {
-        push_to_stack_flow(stack, c);
+        cout << "Error: unbalanced " << d.c << " on line " << d.line_num << endl;
     }
 }
 
-bool check_if_empty(stack<char> &stack) {
+void handle_quotes(stack<Data> &stack, Data d) {
+    if (stack.size() > 0 && d.c == stack.top().c) {
+        stack.pop();
+    }
+    else {
+        push_to_stack_flow(stack, d);
+    }
+}
+
+void handle_block_comments(stack<Data> &stack, vector<Data>::iterator it) {
+    Data placeholder;
+    placeholder.c = 'B';
+    if (it->c == '/') {
+        it++;
+        if (it->c == '*') {
+            placeholder.line_num = it->line_num;
+            push_to_stack_flow(stack, placeholder);
+        }
+        it--;
+    }
+    else if (it->c == '*') {
+        it++;
+        if (it->c == '/') {
+            if (stack.size() < 1) {
+                cout << "Error: Stack is empty." << endl;
+            }
+            else if (stack.top().c != placeholder.c) {
+                cout << "Error: unbalanced /* */ on line "<< stack.top().line_num << endl;
+            }
+            else {
+                stack.pop();
+            }
+        }
+        it--;
+    }
+}
+
+bool check_if_empty(stack<Data> &stack) {
     if (stack.size() < 1) {
         return true;
     }
     return false;
 }
 
-bool check_if_in_string_or_block_comment(stack<char> &stack) {
-    if (stack.top() == '"' || stack.top() == 'B' || stack.top() == '\'') {
+bool check_if_in_string_or_block_comment(stack<Data> &stack) {
+    if (stack.top().c == '"' || stack.top().c == 'B' || stack.top().c == '\'') {
         return true;
     }
     return false;
