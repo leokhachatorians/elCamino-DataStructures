@@ -8,7 +8,7 @@
 using namespace std;
 
 struct Data {
-    char c;
+    char value;
     int line_num;
 };
 
@@ -30,14 +30,14 @@ int main() {
     Data data;
     while (getline(file, line)) {
         for (unsigned long i = 0; i < line.length(); i++) {
-            data.c = line[i];
+            data.value = line[i];
             data.line_num = line_num;
             v.push_back(data);
         }
         line_num++;
     }
-    line_num = 1;
 
+    line_num = 1;
     file.clear();
     file.seekg(0);
     while(getline(file, line)) {
@@ -46,16 +46,16 @@ int main() {
     file.close();
 
     for (vector<Data>::iterator it = v.begin(); it != v.end(); ++it) {
-        if (it->c == '(' || it->c == '{' || it->c == '[') {
+        if (it->value == '(' || it->value == '{' || it->value == '[') {
             push_to_stack_flow(balance_stack, *it);
         }
-        else if (it->c == ')' || it->c == '}' || it->c == ']') {
+        else if (it->value == ')' || it->value == '}' || it->value == ']') {
             pop_flow_parens(balance_stack, *it);
         }
-        else if (it->c == '"' || it->c == '\'') {
+        else if (it->value == '"' || it->value == '\'') {
             handle_quotes(balance_stack, *it);
         }
-        else if (it->c == '/' || it->c == '*') {
+        else if (it->value == '/' || it->value == '*') {
             handle_block_comments(balance_stack, it);
         }
     }
@@ -63,7 +63,7 @@ int main() {
     cout << balance_stack.size() << endl;
 
     while (!balance_stack.empty()) {
-        cout << balance_stack.top().c << endl;
+        cout << balance_stack.top().value << endl;
         balance_stack.pop();
     }
 
@@ -84,30 +84,29 @@ void push_to_stack_flow(stack<Data> &stack, Data d) {
 
 void pop_flow_parens(stack<Data> &stack, Data d) {
     char r;
-    if (d.c == ']') {
+    if (d.value == ']') {
         r = '[';
     }
-    else if (d.c == ')') {
+    else if (d.value == ')') {
         r = '(';
     }
-    else if (d.c == '}') {
+    else if (d.value == '}') {
         r = '{';
     }
 
     if (check_if_empty(stack)) {
-        cout << "Unbalanced: " << r << d.c << " on line " << d.line_num << endl;
-        //cout << "Error: Stack is empty" << endl;
+        cout << "Unbalanced: " << r << d.value << " on line " << d.line_num << endl;
     }
-    else if (stack.top().c == r && !(check_if_in_string_or_block_comment(stack))) {
+    else if (stack.top().value == r && (!check_if_in_string_or_block_comment(stack))) {
         stack.pop();
     }
-    else {
-        cout << "Error: unbalanced " << d.c << " on line " << d.line_num << endl;
+    else if (stack.top().value != r && (!check_if_in_string_or_block_comment(stack))) {
+        cout << "Error: unbalanced 2" << stack.top().value << " on line " << stack.top().line_num << endl;
     }
 }
 
 void handle_quotes(stack<Data> &stack, Data d) {
-    if (stack.size() > 0 && d.c == stack.top().c) {
+    if (stack.size() > 0 && d.value == stack.top().value) {
         stack.pop();
     }
     else {
@@ -117,22 +116,22 @@ void handle_quotes(stack<Data> &stack, Data d) {
 
 void handle_block_comments(stack<Data> &stack, vector<Data>::iterator it) {
     Data placeholder;
-    placeholder.c = 'B';
-    if (it->c == '/') {
+    placeholder.value = 'B';
+    if (it->value == '/') {
         it++;
-        if (it->c == '*') {
+        if (it->value == '*') {
             placeholder.line_num = it->line_num;
             push_to_stack_flow(stack, placeholder);
         }
         it--;
     }
-    else if (it->c == '*') {
+    else if (it->value == '*') {
         it++;
-        if (it->c == '/') {
+        if (it->value == '/') {
             if (stack.size() < 1) {
                 cout << "Error: Stack is empty." << endl;
             }
-            else if (stack.top().c != placeholder.c) {
+            else if (stack.top().value != placeholder.value) {
                 cout << "Error: unbalanced /* */ on line "<< stack.top().line_num << endl;
             }
             else {
@@ -151,7 +150,7 @@ bool check_if_empty(stack<Data> &stack) {
 }
 
 bool check_if_in_string_or_block_comment(stack<Data> &stack) {
-    if (stack.top().c == '"' || stack.top().c == 'B' || stack.top().c == '\'') {
+    if (stack.top().value == '"' || stack.top().value == 'B' || stack.top().value == '\'') {
         return true;
     }
     return false;
