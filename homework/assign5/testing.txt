@@ -1,5 +1,6 @@
 int main() {
- "test]ing"
+ "testing"
+ /* testing */
  [abc]
  'one two three'
 }

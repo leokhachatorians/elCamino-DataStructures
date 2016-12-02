@@ -27,19 +27,20 @@ int main() {
     file.close();
 
     for (vector<char>::iterator it = v.begin(); it != v.end(); ++it) {
-        if (*it == '(') { push_to_stack_flow(balance_stack, *it); }
-        else if (*it == '[') { push_to_stack_flow(balance_stack, *it); }
-        else if (*it == '{') { push_to_stack_flow(balance_stack, *it); }
-        else if (*it == ']' || *it == '}' || *it == ')') {
+        if (*it == '(' || *it == '{' || *it == '[') {
+            push_to_stack_flow(balance_stack, *it);
+        }
+        else if (*it == ')' || *it == '}' || *it == ']') {
             pop_flow_parens(balance_stack, *it);
         }
         else if (*it == '"' || *it == '\'') {
             handle_quotes(balance_stack, *it);
         }
-        else if (*it == '/') { 
+        else if (*it == '/') {
             it++;
-            if (*it == '*') { push_to_stack_flow(balance_stack, 'B'); }
-            it--;
+            if (*it == '*') {
+                push_to_stack_flow(balance_stack, 'B');
+            }
         }
         else if (*it == '*') {
             it++;
@@ -93,14 +94,7 @@ void pop_flow_parens(stack<char> &stack, char c) {
     if (check_if_empty(stack)) {
         cout << "Error: Stack is empty" << endl;
     }
-    else if (
-        stack.top() != r &&
-            (stack.top() != '"'  ||
-             stack.top() != '\'' ||
-             stack.top() != 'B')) {
-                cout << "Was in string/comment" << endl;
-    }
-    else {
+    else if (!(stack.top() != r && check_if_in_string_or_block_comment(stack))) {
         stack.pop();
     }
 }
