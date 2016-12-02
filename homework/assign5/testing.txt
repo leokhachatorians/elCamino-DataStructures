@@ -1,23 +1,5 @@
-#include <iostream>
-" /* */ "
-
-
-pop_flow(char c, &stack) {
-	char r;
-
-	if (c == ']') {
-		r = '[';
-	}
-	else if (c == '}') {
-		r = '{';
-	}
-	else if (c == ')') {
-		r = '(';
-	}
-	
-	if (stack.top() != r &&
-	    (
-		stack.top() != '"' ||
-		stack.top() != '\'' ||
-		stack.top() != 'B') {
-		
+int main() {
+ "test]ing"
+ [abc]
+ 'one two three'
+}

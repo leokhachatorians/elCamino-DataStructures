@@ -9,6 +9,8 @@ using namespace std;
 bool check_if_empty(stack<char> &);
 bool check_if_in_string_or_block_comment(stack<char> &);
 void push_to_stack_flow(stack<char> &, char);
+void pop_flow_parens(stack<char> &, char);
+void handle_quotes(stack<char> &, char);
 
 int main() {
     char c;
@@ -28,56 +30,16 @@ int main() {
         if (*it == '(') { push_to_stack_flow(balance_stack, *it); }
         else if (*it == '[') { push_to_stack_flow(balance_stack, *it); }
         else if (*it == '{') { push_to_stack_flow(balance_stack, *it); }
-        else if (*it == '"') { 
-            if (balance_stack.size() > 0 && *it == balance_stack.top()) {
-                balance_stack.pop();
-            }
-            else {
-                push_to_stack_flow(balance_stack, *it);
-            }
+        else if (*it == ']' || *it == '}' || *it == ')') {
+            pop_flow_parens(balance_stack, *it);
         }
-        else if (*it == '\'') {
-            if (balance_stack.size() > 0 && *it == balance_stack.top()) {
-                balance_stack.pop();
-            }
-            else {
-                push_to_stack_flow(balance_stack, *it);
-            }
+        else if (*it == '"' || *it == '\'') {
+            handle_quotes(balance_stack, *it);
         }
         else if (*it == '/') { 
             it++;
             if (*it == '*') { push_to_stack_flow(balance_stack, 'B'); }
             it--;
-        }
-        else if (*it == ')') {
-            if (balance_stack.size() < 1) {
-                cout << "Error: Stack is empty." << endl;
-            }
-            else if (!(balance_stack.top() != '(' && (balance_stack.top() != '"' || balance_stack.top() != 'B' || balance_stack.top() != '\''))) {
-                cout << "Was in a string/comment" << endl;
-            }
-            else
-                balance_stack.pop();
-        }
-        else if (*it == '}') {
-            if (balance_stack.size() < 1) {
-                cout << "Error: Stack is empty." << endl;
-            }
-            else if (balance_stack.top() != '{' && (balance_stack.top() != '"' || balance_stack.top() != 'B' || balance_stack.top() != '\'')) {
-                cout << "Was in a string/comment" << endl;
-            }
-            else
-                balance_stack.pop();
-        }
-        else if (*it == ']') {
-            if (balance_stack.size() < 1) {
-                cout << "Error: Stack is empty." << endl;
-            }
-            else if (balance_stack.top() != '[' && (balance_stack.top() == '"' || balance_stack.top() == 'B' || balance_stack.top() == '\'')) {
-                cout << "Was in a string/comment" << endl;
-            }
-            else
-                balance_stack.pop();
         }
         else if (*it == '*') {
             it++;
@@ -105,6 +67,52 @@ int main() {
     return 0;
 }
 
+void push_to_stack_flow(stack<char> &stack, char c) {
+    if (check_if_empty(stack)) {
+        stack.push(c);
+    }
+    else {
+        if (!check_if_in_string_or_block_comment(stack)) {
+            stack.push(c);
+        }
+    }
+}
+
+void pop_flow_parens(stack<char> &stack, char c) {
+    char r;
+    if (c == ']') {
+        r = '[';
+    }
+    else if (c == ')') {
+        r = '(';
+    }
+    else if (c == '}') {
+        r = '{';
+    }
+
+    if (check_if_empty(stack)) {
+        cout << "Error: Stack is empty" << endl;
+    }
+    else if (
+        stack.top() != r &&
+            (stack.top() != '"'  ||
+             stack.top() != '\'' ||
+             stack.top() != 'B')) {
+                cout << "Was in string/comment" << endl;
+    }
+    else {
+        stack.pop();
+    }
+}
+
+void handle_quotes(stack<char> &stack, char c) {
+    if (stack.size() > 0 && c == stack.top()) {
+        stack.pop();
+    }
+    else {
+        push_to_stack_flow(stack, c);
+    }
+}
 
 bool check_if_empty(stack<char> &stack) {
     if (stack.size() < 1) {
@@ -118,15 +126,4 @@ bool check_if_in_string_or_block_comment(stack<char> &stack) {
         return true;
     }
     return false;
-}
-
-void push_to_stack_flow(stack<char> &stack, char c) {
-    if (check_if_empty(stack)) {
-        stack.push(c);
-    }
-    else {
-        if (!check_if_in_string_or_block_comment(stack)) {
-            stack.push(c);
-        }
-    }
 }
