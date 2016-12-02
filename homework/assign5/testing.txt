@@ -1,11 +1,23 @@
 #include <iostream>
+" /* */ "
 
-using namespace std;
 
-int main() {{
-	int [a];
-	'a'
-	cout << "testing }''hello!" << endl;
+pop_flow(char c, &stack) {
+	char r;
 
-	/* testing */
-}]
+	if (c == ']') {
+		r = '[';
+	}
+	else if (c == '}') {
+		r = '{';
+	}
+	else if (c == ')') {
+		r = '(';
+	}
+	
+	if (stack.top() != r &&
+	    (
+		stack.top() != '"' ||
+		stack.top() != '\'' ||
+		stack.top() != 'B') {
+		

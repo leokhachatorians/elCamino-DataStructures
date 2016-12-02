@@ -53,12 +53,10 @@ int main() {
             if (balance_stack.size() < 1) {
                 cout << "Error: Stack is empty." << endl;
             }
-            else if (balance_stack.top() != '(' && (balance_stack.top() != '"' || balance_stack.top() != 'B' || balance_stack.top() != '\'')) {
+            else if (!(balance_stack.top() != '(' && (balance_stack.top() != '"' || balance_stack.top() != 'B' || balance_stack.top() != '\''))) {
                 cout << "Was in a string/comment" << endl;
-                //cout << "IGNRED" << endl;
             }
             else
-                //cout << "popping" << endl;
                 balance_stack.pop();
         }
         else if (*it == '}') {
@@ -69,7 +67,6 @@ int main() {
                 cout << "Was in a string/comment" << endl;
             }
             else
-                //cout << "popping" << endl;
                 balance_stack.pop();
         }
         else if (*it == ']') {
@@ -78,27 +75,6 @@ int main() {
             }
             else if (balance_stack.top() != '[' && (balance_stack.top() == '"' || balance_stack.top() == 'B' || balance_stack.top() == '\'')) {
                 cout << "Was in a string/comment" << endl;
-            }
-            else
-                //cout << "popping" << endl;
-                balance_stack.pop();
-        }
-        else if (*it == '"') {
-            if (balance_stack.size() < 1) {
-                cout << "Error: Stack is empty." << endl;
-            }
-            else if (balance_stack.top() != '"') {
-                cout << "error unbalanced \"" << endl;
-            }
-            else
-                balance_stack.pop();
-        }
-        else if (*it == '\'') {
-            if (balance_stack.size() < 1) {
-                cout << "Error: Stack is empty." << endl;
-            }
-            else if (balance_stack.top() != '\'') {
-                cout << "error unbalanced ''" << endl;
             }
             else
                 balance_stack.pop();
@@ -147,16 +123,10 @@ bool check_if_in_string_or_block_comment(stack<char> &stack) {
 void push_to_stack_flow(stack<char> &stack, char c) {
     if (check_if_empty(stack)) {
         stack.push(c);
-        //cout << "EMPTY STACK PUSHING: " << c << "\n" << endl;
     }
     else {
-        //cout << "CURRENT TOP OF STACK: " << stack.top() << endl;
         if (!check_if_in_string_or_block_comment(stack)) {
             stack.push(c);
-            //cout << "PUSHED: " << c << endl << endl;
         }
-       // else {
-       //     cout << "Was in a string" << endl;
-       // }
     }
 }
