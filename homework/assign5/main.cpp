@@ -12,6 +12,8 @@ struct Data {
     int line_num;
 };
 
+bool ERROR_FLAG = false;
+
 bool check_if_empty(stack<Data> &);
 bool check_if_in_string_or_block_comment(stack<Data> &);
 void push_to_stack_flow(stack<Data> &, Data);
@@ -46,6 +48,10 @@ int main() {
     file.close();
 
     for (vector<Data>::iterator it = v.begin(); it != v.end(); ++it) {
+        if (ERROR_FLAG) {
+            cout << 'e' << endl;
+            break;
+        }
         if (it->value == '(' || it->value == '{' || it->value == '[') {
             push_to_stack_flow(balance_stack, *it);
         }
@@ -60,14 +66,11 @@ int main() {
         }
     }
 
-    cout << balance_stack.size() << endl;
 
-    while (!balance_stack.empty()) {
-        cout << balance_stack.top().value << endl;
-        balance_stack.pop();
+    if (balance_stack.size() > 0 && !ERROR_FLAG) {
+        cout << "unbalanced " << balance_stack.top().value << " on line " << balance_stack.top().line_num << endl;
     }
 
-    cout << endl;
     return 0;
 }
 
@@ -95,13 +98,15 @@ void pop_flow_parens(stack<Data> &stack, Data d) {
     }
 
     if (check_if_empty(stack)) {
-        cout << "Unbalanced: " << r << d.value << " on line " << d.line_num << endl;
+        cout << "unbalanced: " << d.value << " on line " << d.line_num << endl;
     }
     else if (stack.top().value == r && (!check_if_in_string_or_block_comment(stack))) {
+        cout << "pair matching " << r << " " << d.value << " on line " << d.line_num << endl;
         stack.pop();
     }
     else if (stack.top().value != r && (!check_if_in_string_or_block_comment(stack))) {
-        cout << "Error: unbalanced 2" << stack.top().value << " on line " << stack.top().line_num << endl;
+        cout << "unbalanced " << d.value << " symbol on line " << d.line_num << endl;
+        ERROR_FLAG = true;
     }
 }
 
