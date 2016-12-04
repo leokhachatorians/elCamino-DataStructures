@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <string>
+#include <string.h>
 #include <stack>
 #include <vector>
 
@@ -23,12 +23,15 @@ void handle_block_comments(stack<Data> &, vector<Data>::iterator);
 
 int main() {
     int line_num = 1;
-    string line;
+    string line, filename;
     vector<Data> v;
     stack<Data> balance_stack;
+
+    cout << "Please enter a filename: ";
+    cin >> filename;
     
     // open file and populate vector
-    ifstream file("testing.txt");
+    ifstream file(filename.c_str());
     Data data;
     while (getline(file, line)) {
         for (unsigned long i = 0; i < line.length(); i++) {
@@ -43,13 +46,12 @@ int main() {
     file.clear();
     file.seekg(0);
     while(getline(file, line)) {
-        cout << setw(3) << left << line_num++ << line << endl;
+        cout << setw(5) << left << line_num++ << line << endl;
     }
     file.close();
 
     for (vector<Data>::iterator it = v.begin(); it != v.end(); ++it) {
         if (ERROR_FLAG) {
-            cout << 'e' << endl;
             break;
         }
         if (it->value == '(' || it->value == '{' || it->value == '[') {
@@ -65,7 +67,6 @@ int main() {
             handle_block_comments(balance_stack, it);
         }
     }
-
 
     if (balance_stack.size() > 0 && !ERROR_FLAG) {
         cout << "unbalanced " << balance_stack.top().value << " on line " << balance_stack.top().line_num << endl;
