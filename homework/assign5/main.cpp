@@ -102,6 +102,7 @@ void pop_flow_parens(stack<Data> &stack, Data d) {
     }
     else if (stack.top().value != r && (!check_if_in_string_or_block_comment(stack))) {
         cout << "Error: unbalanced 2" << stack.top().value << " on line " << stack.top().line_num << endl;
+        cout << "Error: unbalanced 2" << d.value << " on line " << d.line_num << endl;
     }
 }
 

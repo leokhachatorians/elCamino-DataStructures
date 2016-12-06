@@ -1,6 +1,6 @@
 int main() {
  "testin]})'g"
  /* tes["]{)ting */
- 'abc]
+ ]
  'one two three'
 }
