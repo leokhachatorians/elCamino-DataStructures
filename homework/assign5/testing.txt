@@ -1,6 +1,11 @@
 int main() {
  "testin]})'g"
  /* tes["]{)ting */
+<<<<<<< HEAD
  ]
+=======
+ a = [1];
+
+>>>>>>> bc686e1f0f607a58fd7d4bfe07e7bdbca658c0f2
  'one two three'
 }
