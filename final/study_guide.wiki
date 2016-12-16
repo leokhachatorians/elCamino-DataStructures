@@ -1,0 +1,70 @@
+_Binary Search Tree_
+	* rooted binary tree
+	keep their keys in sorted order so you can utilize them in the same manner 
+	as the binary search algo
+	
+_Leaf of a Tree_
+	* doesnt have any children of its own
+
+_Degree of a tree node_
+	* Number of subtrees a node has
+		- Degree 0 = _leaf node_
+
+_Degree of a tree_
+	* Max degree of a node in a tree
+	* A binary tree is degree 2 since it has atmost 2 children
+
+4. _Copy a tree_
+	http://stackoverflow.com/questions/3918811/copy-binary-tree-in-order	
+	TreeNode *copy_tree(TreeNode *T) {
+		if (T == NULL) {
+			return NULL;
+		}
+		TreeNode *new_root = new TreeNode;
+		new_root->data = T->data;
+		new_root->left = copy_tree(T->left);
+		new_root->right = copy_tree(T->right);
+		return new_root;
+	}
+	
+6. _Expand Leafs_
+	TreeNode *expand_leaf(TreeNode *node, ItemType x, ItemType y) {
+		if (node == NULL) {
+			return NULL;
+		}
+		TreeNode *new_node = new TreeNode;
+		if (node->left == NULL && node->right == NULL) {
+			new_node->left = new TreeNode;
+			new_node->right = new TreeNode;
+			new_node->left->value = x;
+			new_node->right->value = y;
+		}
+		else {
+			new_node->left = expand_leaf(node->left, x, y);
+			new_node->right = expand_leaf(node->right, x, y);
+		}
+		return new_node;
+	}
+
+7. _Get Height_
+	int height(TreeNode *T) {
+		if (T == NULL) {
+			return -1'
+		}
+		int left = height(T->left);
+		int right = height(T->right);
+		return std::max(left, right) + 1;
+		
+	}
+
+8. _Same Tree_
+		http://www.cprogramming.com/tutorial/lesson18.html
+
+= TREE TRAVERSAL =
+	1. Pre-order
+		+ a * b - c d
+	2. in-order
+		a + b * c - d
+	3. post-oder
+		a b c d - * +
+	
